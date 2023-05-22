@@ -89,7 +89,7 @@
         "_value": false
       },
       "webview": {
-        "_value": true
+        "_value": false
       },
       "tween": {
         "_value": true
@@ -110,7 +110,7 @@
         "_value": false
       },
       "custom-pipeline": {
-        "_value": true
+        "_value": false
       }
     },
     "includeModules": [
@@ -118,14 +118,12 @@
       "animation",
       "audio",
       "base",
-      "custom-pipeline",
       "gfx-webgl",
       "gfx-webgl2",
       "intersection-2d",
       "profiler",
       "tween",
-      "ui",
-      "webview"
+      "ui"
     ],
     "noDeprecatedFeatures": {
       "value": false,

@@ -1,4 +1,5 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, UITransform, view } from 'cc';
+import { WXManager } from '../manager/WXManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('Home')
@@ -12,6 +13,14 @@ export class Home extends Component {
         this.layerBook = this.node.getChildByName("LayerBook");
         this.layerGet = this.node.getChildByName("LayerGet");
         this.layerRank = this.node.getChildByName("LayerRank");
+    }
+
+    start() {
+        let btnRank = this.node.getChildByName("Home").getChildByName("BtnRank");
+        let caNode = this.node.getChildByName("Home");
+        let btnInfo = this.getBtnRankRect(btnRank, caNode);
+        WXManager.wxLogin(btnInfo, this.onBtnRank.bind(this));
+
     }
 
     onBtnGet() {
@@ -34,6 +43,25 @@ export class Home extends Component {
 
     onBtnStart() {
 
+    }
+
+    getBtnRankRect(btn: Node, caNode: Node) {
+        // wx.getSystemInfo 的同步版本
+        let sys = window["wx"].getSystemInfoSync();
+        let rect = btn.getComponent(UITransform).getBoundingBoxToWorld();
+        let ratio = view.getDevicePixelRatio();
+        let scale = view.getScaleX();
+        let factor = scale / ratio;
+
+        let diffY = caNode.getComponent(UITransform).height - view.getDesignResolutionSize().height;
+        let left = rect.x * factor;
+        let top = sys.screenHeight - (rect.y + rect.height) * factor - diffY / 2 * factor;
+        let w = rect.width * factor;
+        let h = rect.height * factor;
+
+        // 手机屏幕 的区域 rect
+        let srect = { left: left, top: top, width: w, height: h };
+        return srect;
     }
 }
 

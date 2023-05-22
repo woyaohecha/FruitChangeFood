@@ -1,10 +1,13 @@
 import { _decorator, Component, Node } from 'cc';
+import { AppConfig } from '../AppConfig';
 const { ccclass, property } = _decorator;
 
 const httpUrl = "http://eliminate-game.sxycykj.net//api/app/clientAPI/";
+const getOpenId = "getOpenId/?";
 const saveUserInfo = "saveUserInfo/?";
 const saveLevelByUid = "saveLevelByUid/?";
 const getRank = "getRank";
+
 
 @ccclass('HttpManager')
 export class HttpManager {
@@ -24,15 +27,24 @@ export class HttpManager {
         xhr.send();
     }
 
+    public static getOpenId(code) {
+        let data = "appid=" + AppConfig.appid + "&&secret=" + AppConfig.secret + "&&js_code=" + code;
+        this.httpRequest(getOpenId, (res) => {
+            console.log("getOpenId:", res);
+            this.uid = res.data.openid;
+            console.log("获取用户uid:", this.uid);
+        }, data)
+    }
+
     public static saveUserInfo() {
-        let data = "uid=" + this.uid + "nickname=" + this.nickname + "img=" + this.img;
+        let data = "uid=" + this.uid + "&&nickname=" + this.nickname + "&&img=" + this.img;
         this.httpRequest(saveUserInfo, (res) => {
             console.log("保存用户信息:", res);
         }, data)
     }
 
     public static saveLevelByUid(levelNum: number, levelTime: number) {
-        let data = "uid=" + this.uid + "level_num=" + levelNum + "level_time=" + levelTime;
+        let data = "uid=" + this.uid + "&&level_num=" + levelNum + "&&level_time=" + levelTime;
         this.httpRequest(saveLevelByUid, (res) => {
             console.log("保存关卡信息:", res);
         }, data)
