@@ -1,5 +1,6 @@
-import { _decorator, Component, Node, UITransform, view } from 'cc';
+import { _decorator, Component, Node, UITransform, view, director } from 'cc';
 import { WXManager } from '../manager/WXManager';
+import { wx } from './Loading';
 const { ccclass, property } = _decorator;
 
 @ccclass('Home')
@@ -42,12 +43,15 @@ export class Home extends Component {
     }
 
     onBtnStart() {
-
+        director.loadScene("game");
     }
 
     getBtnRankRect(btn: Node, caNode: Node) {
         // wx.getSystemInfo 的同步版本
-        let sys = window["wx"].getSystemInfoSync();
+        if (!wx) {
+            return;
+        }
+        let sys = wx.getSystemInfoSync();
         let rect = btn.getComponent(UITransform).getBoundingBoxToWorld();
         let ratio = view.getDevicePixelRatio();
         let scale = view.getScaleX();

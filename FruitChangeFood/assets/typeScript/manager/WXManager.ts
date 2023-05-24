@@ -9,14 +9,16 @@ export class WXManager {
     public static wxLogin(btnInfo: any, onRankGetSettingSuccess: Function) {
         console.log("进入微信登录");
         if (Tools.platform != "wx") {
+            console.log("不是微信平台！");
             return;
         }
         let self = this;
         wx.login({
             success: res => {
                 console.log("微信登录成功:", res);
-                HttpManager.getOpenId(res.code);
-                self.onGetSetting(btnInfo, onRankGetSettingSuccess);
+                HttpManager.getOpenId(res.code, () => {
+                    self.onGetSetting(btnInfo, onRankGetSettingSuccess);
+                });
             },
             fail: res => {
                 console.log("登录失败", res);
@@ -31,6 +33,7 @@ export class WXManager {
                     wx.getUserInfo({
                         success: res => {
                             console.log("获取用户信息成功：", res);
+                            HttpManager.saveUserInfo(res.userInfo.nickName, res.userInfo.avatarUrl);
                         },
                         fail: res => {
                             console.log("获取用户信息失败：", res);
@@ -58,7 +61,8 @@ export class WXManager {
 
                     button.onTap(res => {
                         if (res.userInfo) {
-                            console.log("全屏按钮授权成功：", res);
+                            console.log("全屏按钮授权成功：", res.userInfo);
+                            HttpManager.saveUserInfo(res.userInfo.nickName, res.userInfo.avatarUrl);
                             button.destroy();
                         } else {
                             console.log("全屏按钮授权失败：", res);
@@ -90,7 +94,7 @@ export class WXManager {
                 lineHeight: 16,
             }
         })
-        console.log("等待点击排行榜授权按钮:", button);
+        console.log("创建排行榜授权按钮成功:", button);
         button.onTap(res => {
             if (res.userInfo) {
                 console.log("排行榜授权成功：", res);

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, instantiate, Label, Sprite, ScrollView, v2, assetManager, SpriteFrame } from 'cc';
+import { _decorator, Component, Node, instantiate, Label, Sprite, ScrollView, v2, assetManager, SpriteFrame, resources } from 'cc';
 import { HttpManager } from '../manager/HttpManager';
 import { PrefabManager } from '../manager/PrefabManager';
 
@@ -9,6 +9,7 @@ export class Rank extends Component {
     listPanel: Node = null;
     data: any[] = [];
     inited: boolean = false;
+    defaultImage: SpriteFrame = null;
 
     onLoad() {
         this.listPanel = this.node.getChildByName("PanelBg").getChildByName("ListPanel").getChildByName("view").getChildByName("content");
@@ -23,6 +24,7 @@ export class Rank extends Component {
     }
 
     setLayer() {
+        let self = this;
         if (this.data.length > 0) {
             for (let i = 0; i < this.data.length; i++) {
                 let item = instantiate(PrefabManager.rankItemPrefab);
@@ -32,12 +34,14 @@ export class Rank extends Component {
                 item.getChildByName("ScoreAndTime").getChildByName("Time").getComponent(Label).string = this.data[i].level_time;
 
                 let imageUrl = this.data[i].img;
+
+                let profile = item.getChildByName("Profile").getChildByName("Mask").getChildByName("Image").getComponent(Sprite);
                 assetManager.loadRemote(imageUrl, SpriteFrame, (e, asset: SpriteFrame) => {
                     if (e) {
                         console.log(e);
                         return;
                     }
-                    item.getChildByName("Profile").getChildByName("Image").getComponent(Sprite).spriteFrame = asset;
+                    profile.spriteFrame = asset;
                 })
 
                 item.setParent(this.listPanel);
@@ -45,9 +49,9 @@ export class Rank extends Component {
             this.inited = true;
         } else {
             HttpManager.getRank((res) => {
-                this.data = JSON.parse(res).data.rankList;
-                console.log(this.data);
-                this.setLayer();
+                self.data = JSON.parse(res).data.rankList;
+                console.log("获取排行榜数据:", self.data);
+                self.setLayer();
             });
         }
     }
