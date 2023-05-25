@@ -1,6 +1,7 @@
-import { _decorator, Component, Node, instantiate, Label, Sprite, ScrollView, v2, assetManager, SpriteFrame, resources } from 'cc';
+import { _decorator, Component, Node, instantiate, Label, Sprite, ScrollView, v2, assetManager, SpriteFrame, resources, Texture2D, SpringJoint2D, ImageAsset } from 'cc';
 import { HttpManager } from '../manager/HttpManager';
 import { PrefabManager } from '../manager/PrefabManager';
+import Tools from '../Tools';
 
 const { ccclass, property } = _decorator;
 
@@ -31,19 +32,27 @@ export class Rank extends Component {
                 item.getChildByName("RankNum").getComponent(Label).string = (i + 1) + ".";
                 item.getChildByName("Name").getComponent(Label).string = this.data[i].nickname;
                 item.getChildByName("ScoreAndTime").getChildByName("Score").getComponent(Label).string = this.data[i].level_max;
-                item.getChildByName("ScoreAndTime").getChildByName("Time").getComponent(Label).string = this.data[i].level_time;
+                item.getChildByName("ScoreAndTime").getChildByName("Time").getComponent(Label).string = Tools.timeFormat(this.data[i].level_time);
 
-                let imageUrl = this.data[i].img;
+                let imageUrl: string = this.data[i].img;
 
                 let profile = item.getChildByName("Profile").getChildByName("Mask").getChildByName("Image").getComponent(Sprite);
-                assetManager.loadRemote(imageUrl, SpriteFrame, (e, asset: SpriteFrame) => {
-                    if (e) {
-                        console.log(e);
-                        return;
-                    }
-                    profile.spriteFrame = asset;
-                })
-
+                console.log("profile:", profile)
+                console.log("头像地址:", imageUrl.substring(-1, 8), imageUrl);
+                if (imageUrl.substring(-1, 8) == "https://") {
+                    assetManager.loadRemote(imageUrl, { ext: '.jpg' }, (e, asset: ImageAsset) => {
+                        if (e) {
+                            console.log(e);
+                            return;
+                        }
+                        console.log("加载头像成功:", asset, typeof (asset));
+                        let sp = new SpriteFrame();
+                        let tex = new Texture2D();
+                        tex.image = asset;
+                        sp.texture = tex;
+                        profile.spriteFrame = sp;
+                    })
+                }
                 item.setParent(this.listPanel);
             }
             this.inited = true;

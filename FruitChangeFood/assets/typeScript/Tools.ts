@@ -46,6 +46,18 @@ export default class Tools {
         }
     }
 
+    static timeFormat(time: number) {
+        let h, m, s: string;
+
+        s = String(time % 60 >= 10 ? time % 60 : "0" + time % 10);
+
+        m = Math.floor(time / 60) % 60 >= 10 ? Math.floor(time / 60) % 60 : "0" + Math.floor(time / 60) % 60;
+
+        h = Math.floor(time / 3600) >= 10 ? Math.floor(time / 3600) : "0" + Math.floor(time / 3600);
+
+        return h + ":" + m + ":" + s;
+    }
+
     static getPlatformInfo() {
         if (Tools.platform) {
             return Tools.platform;

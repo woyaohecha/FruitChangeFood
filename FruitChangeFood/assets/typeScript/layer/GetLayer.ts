@@ -37,7 +37,7 @@ export class GetLayer extends Component {
     onCopyBtn() {
         if (Tools.platform == "wx") {
             wx.setClipboardData({
-                data: this.desTop
+                data: JsonManager.getLayerInfo.desTop
             });
             Tools.showCommonTips("复制成功", this.node.parent);
         }

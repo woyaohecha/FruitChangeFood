@@ -1,6 +1,9 @@
-import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math } from 'cc';
 import { block } from './block';
 import { gameData } from './gameData';
+import { AudioManager } from './manager/AudioManager';
+import { HttpManager } from './manager/HttpManager';
+import Tools from './Tools';
 const { ccclass, property } = _decorator;
 
 @ccclass('game')
@@ -68,10 +71,19 @@ export class game extends Component {
     idChaPingAD: string;
     idJiLiShiPinAD: string;
     f_scale: number;
+    layerSetting: Node;
+
+    timer: number;
+    timerLabel: Label;
+
+    onLoad() {
+        this.layerSetting = this.node.getChildByName("LayerSetting");
+        this.timerLabel = this.node.getChildByName("top").getChildByName("Timer").getComponent(Label);
+    }
 
     start() {
         console.log('start');
-
+        this.layerSetting.active = false;
         this.isWX = false
         this.wx = window['wx']
         this.idBannerAD = 'xxxxxx'//banner广告位id
@@ -98,6 +110,9 @@ export class game extends Component {
         console.log(this.f_scale);
 
         this.audioSource = this.node.getComponent(AudioSource)
+        if (AudioManager.canMusicPlay) {
+            this.audioSource.play();
+        }
 
         this.yyBlockChu = 120//移出的y坐标
         this.xxStartDi = 610 / 2 - 280 - 610 / 2 + 40
@@ -128,6 +143,8 @@ export class game extends Component {
         input.on(Input.EventType.TOUCH_MOVE, this.onTouchMove, this);
         input.on(Input.EventType.TOUCH_END, this.onTouchEnd, this);
 
+        this.timerInit();
+        this.schedule(this.timerRun, 1);
     }
 
     //分享给好友
@@ -467,7 +484,9 @@ export class game extends Component {
         }
 
         if (is_xiaoChu) {
-            this.audioSource.playOneShot(this.arrAudio[1], 1)
+            if (AudioManager.canSoundPlay) {
+                this.audioSource.playOneShot(this.arrAudio[1], 1)
+            }
             let children_2 = this.parentBlocksDi.children
             for (let i = 0; i < children_2.length; i++) {
                 let ts_block_2 = children_2[i].getComponent(block)
@@ -494,8 +513,11 @@ export class game extends Component {
 
         if (children_2.length - num_xiaoChu_geShu >= 7) {
             this.gameType = -1
-            this.audioSource.playOneShot(this.arrAudio[2], 1)
+            if (AudioManager.canSoundPlay) {
+                this.audioSource.playOneShot(this.arrAudio[2], 1)
+            }
             console.log('游戏失败');
+            this.unschedule(this.timerRun);
 
             if (this.interstitialAd) {
                 this.interstitialAd.show().catch((err) => {
@@ -649,7 +671,9 @@ export class game extends Component {
 
             let node_UITransform = children[i].getComponent(UITransform)
             if (node_UITransform.getBoundingBox().contains(new Vec2(v3_touchStart.x, v3_touchStart.y))) {
-                this.audioSource.playOneShot(this.arrAudio[0], 1)
+                if (AudioManager.canSoundPlay) {
+                    this.audioSource.playOneShot(this.arrAudio[0], 1)
+                }
                 this.numTouchStart = i
                 console.log('点中了：' + i);
                 tween(children[i])
@@ -760,9 +784,14 @@ export class game extends Component {
         let children_1 = this.parentBlocks.children
         if (children_1.length == 0) {
             this.gameType = 1
-            this.audioSource.playOneShot(this.arrAudio[3], 1)
+            if (AudioManager.canSoundPlay) {
+                this.audioSource.playOneShot(this.arrAudio[3], 1)
+            }
             console.log('游戏通关');
-            this.numLevel++
+            this.numLevel++;
+            if (this.numLevel > HttpManager.levelNum) {
+                HttpManager.saveLevelByUid(this.numLevel, this.timer);
+            }
 
             if (this.interstitialAd) {
                 this.interstitialAd.show().catch((err) => {
@@ -850,9 +879,12 @@ export class game extends Component {
             this.gameType = 0
             this.layerOver.active = false
             this.btn1()
+            this.schedule(this.timerRun, 1);
         } else if (str == 'btn_cw') {
             this.numLevel = 0
             this.init()
+            this.timerInit();
+            this.schedule(this.timerRun, 1);
         } else if (str == 'btn_yin') {
             let children = this.parentEdit.children
             for (let i = 0; i < children.length; i++) {
@@ -1084,9 +1116,21 @@ export class game extends Component {
         }
     }
 
-
-    update(deltaTime: number) {//每分钟执行60次
-
+    onBtnSetting() {
+        this.layerSetting.active = true;
     }
+
+
+
+    timerInit() {
+        this.timer = 0;
+        this.timerLabel.string = Tools.timeFormat(this.timer);
+    }
+
+    timerRun() {
+        this.timer++;
+        this.timerLabel.string = Tools.timeFormat(this.timer);
+    }
+
 }
 
