@@ -2,7 +2,7 @@ import { _decorator, Component, Node } from 'cc';
 import { AppConfig } from '../AppConfig';
 const { ccclass, property } = _decorator;
 
-const httpUrl = "http://eliminate-game.sxycykj.net//api/app/clientAPI/";
+const httpUrl = "https://eliminate-game.sxycykj.net//api/app/clientAPI/";
 const getOpenId = "getOpenId/?";  //获取openid（即为uid）接口
 const saveUserInfo = "saveUserInfo/?";  //保存用户数据（头像，昵称）接口
 const saveLevelByUid = "saveLevelByUid/?";//保存用户记录（关卡，对应时间，需要判断是否需要更新）

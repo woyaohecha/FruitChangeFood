@@ -37,8 +37,6 @@ export class Rank extends Component {
                 let imageUrl: string = this.data[i].img;
 
                 let profile = item.getChildByName("Profile").getChildByName("Mask").getChildByName("Image").getComponent(Sprite);
-                console.log("profile:", profile)
-                console.log("头像地址:", imageUrl.substring(-1, 8), imageUrl);
                 if (imageUrl.substring(-1, 8) == "https://") {
                     assetManager.loadRemote(imageUrl, { ext: '.jpg' }, (e, asset: ImageAsset) => {
                         if (e) {

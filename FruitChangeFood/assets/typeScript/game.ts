@@ -1,6 +1,7 @@
-import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math, director, VideoPlayer } from 'cc';
 import { block } from './block';
 import { gameData } from './gameData';
+import { ADManager } from './manager/ADManager';
 import { AudioManager } from './manager/AudioManager';
 import { HttpManager } from './manager/HttpManager';
 import Tools from './Tools';
@@ -75,10 +76,13 @@ export class game extends Component {
 
     timer: number;
     timerLabel: Label;
+    videoPlayer: VideoPlayer;
 
     onLoad() {
         this.layerSetting = this.node.getChildByName("LayerSetting");
         this.timerLabel = this.node.getChildByName("top").getChildByName("Timer").getComponent(Label);
+        this.videoPlayer = this.node.getChildByName("VideoPanel").getChildByName("VideoPlayer").getComponent(VideoPlayer);
+        ADManager.videoPlayer = this.videoPlayer;
     }
 
     start() {
@@ -91,15 +95,15 @@ export class game extends Component {
         this.idJiLiShiPinAD = 'xxxxxx'//激励视频广告位id
 
         this.numLevel = 0 //0：第一关
-        this.numBlockTypeGeShu = 10 //随机关卡，种类的最少个数
+        this.numBlockTypeGeShu = 5 //随机关卡，种类的最少个数
         this.numBlockType = 2 //随机关卡，下一关比该关卡多几个种类
-        this.numBlocksKuaiGeShu = 99 //随机关卡，最少个块数 必须是3的倍数
-        this.numBlocksKuai = 6 //随机关卡，下一关比该关卡多几个块 必须是3的倍数
+        this.numBlocksKuaiGeShu = 30 //随机关卡，最少个块数 必须是3的倍数
+        this.numBlocksKuai = 3 //随机关卡，下一关比该关卡多几个块 必须是3的倍数
         this.arrNumDJ = [3, 3, 3, 3]//每个道具的个数
         this.isEditing = this.parentEdit.active //是否是编辑模式
         this.numTypeEdit = 1//(0:减，1：加)
         this.numTypeSuiJi = 2 //随机模式下，用那种类型的坐标（0：随机的 1：规范的 2：有随机也有规范）
-        this.numSuiJi = 200 //编辑模式下，随机按钮产生的块的个数
+        this.numSuiJi = 60 //编辑模式下，随机按钮产生的块的个数
 
         this.numDJ = -1//(0:移出道具，1：撤回道具 2：洗牌道具 3：复活道具)
 
@@ -111,6 +115,7 @@ export class game extends Component {
 
         this.audioSource = this.node.getComponent(AudioSource)
         if (AudioManager.canMusicPlay) {
+            ADManager.gameAudioSource = this.audioSource;
             this.audioSource.play();
         }
 
@@ -285,11 +290,12 @@ export class game extends Component {
 
         this.pddj()
         this.btn3()
+        this.videoPlayer.node.parent.active = false;
     }
 
     createBlocksEdit() {
         let i_num = 15 //行
-        let j_num = 13 //列
+        let j_num = 13//列
         let num_zhongJian = i_num / 2
 
         for (let i = 0; i < i_num; i++) {
@@ -360,8 +366,8 @@ export class game extends Component {
             num_type = this.gameData.arrTypeLevel[this.numLevel]
         }
 
-        if (num_type > 30) {
-            num_type = 30
+        if (num_type > 15) {
+            num_type = 15
         }
 
         let num_type_random = Math.floor(Math.random() * num_type)//5
@@ -401,6 +407,7 @@ export class game extends Component {
                 if (num_geShu % 3 == 0) {
                     num_type_random = Math.floor(Math.random() * num_type)//6,7
                 }
+                console.log(num_type_random);
                 ts_block.init(num_type_random)//6,6,6,7,7,7
             }
 
@@ -526,6 +533,10 @@ export class game extends Component {
             }
 
             this.scheduleOnce(function () {
+                let levelLabel: Label = this.layerOver.getChildByName("Panel").getChildByName("LevelNum").getChildByName("LevelNumBg").children[0].getComponent(Label);
+                let timeLabel: Label = this.layerOver.getChildByName("Panel").getChildByName("Time").getChildByName("TimeBg").children[0].getComponent(Label);
+                levelLabel.string = this.numLevel;
+                timeLabel.string = Tools.timeFormat(this.timer);
                 this.layerOver.active = true
             }, 0.5)
         }
@@ -600,6 +611,21 @@ export class game extends Component {
 
             }
         }
+    }
+
+    onBtnRelive() {
+        console.log("复活流程");
+        let self = this;
+        ADManager.showVideoAd(() => {
+            self.gameType = 0
+            self.layerOver.active = false
+            self.btn1()
+            self.schedule(self.timerRun, 1);
+        });
+    }
+
+    onBtnBackToHome() {
+        director.loadScene("Home");
     }
 
     onTouchStart(event: EventTouch) {
@@ -787,9 +813,12 @@ export class game extends Component {
             if (AudioManager.canSoundPlay) {
                 this.audioSource.playOneShot(this.arrAudio[3], 1)
             }
-            console.log('游戏通关');
+
             this.numLevel++;
+            console.log('游戏通关');
+            console.log("当前关卡：" + this.numLevel, "-已保存记录：", +HttpManager.levelNum);
             if (this.numLevel > HttpManager.levelNum) {
+                console.log("保存最新记录" + this.numLevel);
                 HttpManager.saveLevelByUid(this.numLevel, this.timer);
             }
 
@@ -804,8 +833,9 @@ export class game extends Component {
             }, 1)
 
         }
-
     }
+
+
 
     pdBlockDiMoving() {
         let is_moving = false
@@ -917,12 +947,84 @@ export class game extends Component {
                 let i_v3_random = Math.floor(Math.random() * arr_v3_block_edit.length)
                 node_block.setPosition(arr_v3_block_edit[i_v3_random])
                 let ts_block = node_block.getComponent(block)
-                ts_block.init(Math.floor(Math.random() * 30))
+                ts_block.init(Math.floor(Math.random() * 15))
             }
 
             this.shuaXinLevelInfo()
             this.pddj()
         }
+    }
+
+    canMoveOut() {
+        let arr_block_di = []
+        let children_di_1 = this.parentBlocksDi.children
+        for (let i = 0; i < children_di_1.length; i++) {
+            let ts_block = children_di_1[i].getComponent(block)
+            if (ts_block.numDi < 3 && ts_block.isXiaoChu == false) {
+                arr_block_di.push(children_di_1[i])
+            }
+        }
+
+        let num_geShu = arr_block_di.length
+
+        if (num_geShu == 0) {
+            this.arrNumDJ[0]++
+            this.showTip('当前不可用该道具')
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    onPropBtnOut() {
+        let self = this;
+        if (this.canMoveOut()) {
+            ADManager.showVideoAd(() => {
+                self.btn1();
+            })
+        }
+    }
+
+    canBack() {
+        let children = this.parentBlocksDi.children
+        let i_end = -1
+        for (let i = children.length - 1; i >= 0; i--) {
+            let ts_block = children[i].getComponent(block)
+            if (ts_block.isXiaoChu) {
+                continue
+            }
+            i_end = i
+            break
+        }
+        let num_di_cheHui = -1
+        if (i_end != -1) {
+            let ts_block = children[i_end].getComponent(block)
+            num_di_cheHui = ts_block.numDi
+        }
+
+        if (num_di_cheHui == -1) {
+            this.arrNumDJ[1]++
+            this.showTip('当前不可用该道具')
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    onPropBtnBack() {
+        let self = this;
+        if (this.canBack()) {
+            ADManager.showVideoAd(() => {
+                self.btn2();
+            })
+        }
+    }
+
+    onPropBtnRefresh() {
+        let self = this;
+        ADManager.showVideoAd(() => {
+            self.btn3();
+        })
     }
 
     //撤回
@@ -962,11 +1064,6 @@ export class game extends Component {
                 .start()
         }
 
-        if (num_di_cheHui == -1) {
-            this.arrNumDJ[1]++
-            this.showTip('当前不可用该道具')
-        }
-
         let children_di_2 = this.parentBlocksDi.children
         for (let i = 0; i < children_di_2.length; i++) {
 
@@ -998,11 +1095,6 @@ export class game extends Component {
         }
 
         let num_geShu = arr_block_di.length
-
-        if (num_geShu == 0) {
-            this.arrNumDJ[0]++
-            this.showTip('当前不可用该道具')
-        }
 
         for (let i = arr_block_di.length - 1; i >= 0; i--) {
 
@@ -1043,7 +1135,6 @@ export class game extends Component {
                 .start()
 
         }
-
     }
 
     //洗牌功能

@@ -1,4 +1,5 @@
 import { _decorator, Component, Node, AudioSource, game, director } from 'cc';
+import { ADManager } from '../manager/ADManager';
 import { AudioManager } from '../manager/AudioManager';
 const { ccclass, property } = _decorator;
 
@@ -37,16 +38,16 @@ export class SettingLayer extends Component {
 
     setMusic(state: string) {
         if (state == "on") {
+            this.btnMusic.getChildByName("On").active = true;
+            this.btnMusic.getChildByName("Off").active = false;
             if (!this.audioSource.playing) {
-                this.btnMusic.getChildByName("On").active = true;
-                this.btnMusic.getChildByName("Off").active = false;
                 AudioManager.canMusicPlay = true;
                 this.audioSource.play();
             }
         } else {
+            this.btnMusic.getChildByName("On").active = false;
+            this.btnMusic.getChildByName("Off").active = true;
             if (this.audioSource.playing) {
-                this.btnMusic.getChildByName("On").active = false;
-                this.btnMusic.getChildByName("Off").active = true;
                 AudioManager.canMusicPlay = false;
                 this.audioSource.pause();
             }

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node } from 'cc';
+import { _decorator, Component, Node, UITransform, view } from 'cc';
 import { wx } from '../layer/Loading';
 import Tools from '../Tools';
 import { HttpManager } from './HttpManager';
@@ -110,6 +110,28 @@ export class WXManager {
             }
         })
         button.show();
+    }
+
+    public static getBtnRankRect(btn: Node, caNode: Node) {
+        // wx.getSystemInfo 的同步版本
+        if (!wx) {
+            return;
+        }
+        let sys = wx.getSystemInfoSync();
+        let rect = btn.getComponent(UITransform).getBoundingBoxToWorld();
+        let ratio = view.getDevicePixelRatio();
+        let scale = view.getScaleX();
+        let factor = scale / ratio;
+
+        let diffY = caNode.getComponent(UITransform).height - view.getDesignResolutionSize().height;
+        let left = rect.x * factor;
+        let top = sys.screenHeight - (rect.y + rect.height) * factor - diffY / 2 * factor;
+        let w = rect.width * factor;
+        let h = rect.height * factor;
+
+        // 手机屏幕 的区域 rect
+        let srect = { left: left, top: top, width: w, height: h };
+        return srect;
     }
 }
 

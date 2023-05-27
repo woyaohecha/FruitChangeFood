@@ -1,4 +1,5 @@
 import { _decorator, Component, Node, UITransform, view, director } from 'cc';
+import { ADManager } from '../manager/ADManager';
 import { WXManager } from '../manager/WXManager';
 import { wx } from './Loading';
 const { ccclass, property } = _decorator;
