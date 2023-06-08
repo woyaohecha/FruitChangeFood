@@ -30,7 +30,7 @@ export class Book extends Component {
                 item.getChildByName("Id").getComponent(Label).string = i < 9 ? "0" + (i + 1) : "" + (i + 1);
                 item.getChildByName("Icon").getChildByName("Icon").getComponent(Sprite).spriteFrame = JsonManager.bookList[i].icon;
                 item.getChildByName("Name").getComponent(Label).string = JsonManager.bookList[i].name;
-                item.getChildByName("Des").getComponent(Label).string = JsonManager.bookList[i].des;
+                // item.getChildByName("Des").getComponent(Label).string = JsonManager.bookList[i].des;
                 item.setParent(this.listPanel);
             }
             this.inited = true;

@@ -51,7 +51,7 @@ export class block extends Component {
             .call(() => {
                 this.spYuanSu.spriteFrame = this.spfYuanSu[this.blockType]
             })
-            .to(0.1, { scale: new Vec3(0.7, 0.7, 0.7) })
+            .to(0.1, { scale: new Vec3(0.8, 0.8, 0.8) })
             .start()
 
 
