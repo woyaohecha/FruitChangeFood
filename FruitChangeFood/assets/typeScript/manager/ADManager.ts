@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, VideoPlayer, VideoClip, resources, AudioSource } from 'cc';
+import { _decorator, Component, Node, VideoPlayer, VideoClip, resources, AudioSource, UITransform } from 'cc';
 import { AdType, AppConfig } from '../AppConfig';
 import { wx } from '../layer/Loading';
 import Tools from '../Tools';
@@ -12,16 +12,39 @@ export class ADManager {
     private static clipsIndex: number = 0;
 
     public static videoClips: VideoClip[] = [];
+    public static videoClipUrls: string[] = [
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/dance.m4v",
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/father.m4v",
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/work.m4v",
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/world-cup.m4v"
+    ]
     public static videoPlayer: VideoPlayer = null;
     public static gameAudioSource: AudioSource = null;
 
     public static showVideoAd(completed: Function) {
-        console.log("AppConfig.adType:", AppConfig.adType);
-        if (AppConfig.adType == AdType.LOCALAD) {
-            this.showVideoAd_Local_WX(completed);
-        } else {
-            this.showVideoAd_WX(completed);
-        }
+        // completed();
+        // return;
+        let index = Tools.getRandomNum(0, 3);
+        this.videoPlayer.remoteURL = this.videoClipUrls[index];
+        console.log("videoUrl:", this.videoClipUrls[index]);
+        this.videoPlayer.node.once("ready-to-play", () => {
+            console.log("ready-to-play");
+            if (AudioManager.canMusicPlay) {
+                this.gameAudioSource.pause();
+            }
+            // this.videoPlayer.stayOnBottom = false;
+            this.videoPlayer.node.active = true;
+            this.videoPlayer.play();
+            console.log(this.videoPlayer.node, this.videoPlayer.clip);
+        });
+        this.videoPlayer.node.once("completed", () => {
+            if (AudioManager.canMusicPlay) {
+                this.gameAudioSource.play();
+            }
+            console.log("completed");
+            this.videoPlayer.node.active = false;
+            completed();
+        }, this);
     }
 
     private static showVideoAd_Local(completed: Function) {

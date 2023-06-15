@@ -1,6 +1,7 @@
 import { _decorator, Component, Node, UITransform, view, director } from 'cc';
 import { ADManager } from '../manager/ADManager';
 import { WXManager } from '../manager/WXManager';
+import Tools from '../Tools';
 import { wx } from './Loading';
 const { ccclass, property } = _decorator;
 
@@ -26,7 +27,21 @@ export class Home extends Component {
     }
 
     onBtnGet() {
-        this.layerGet.active = true;
+        // this.layerGet.active = true;
+        if (Tools.platform == "wx") {
+            console.log("navigateToMiniProgram");
+            wx.navigateToMiniProgram({
+                appId: 'wxaaf796d43c4e9669',
+                path: '',
+                extraData: {
+                    foo: 'bar'
+                },
+                envVersion: '',
+                success(res) {
+                    // 打开成功
+                }
+            })
+        }
     }
 
     onBtnBook() {

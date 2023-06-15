@@ -81,7 +81,8 @@ export class game extends Component {
     onLoad() {
         this.layerSetting = this.node.getChildByName("LayerSetting");
         this.timerLabel = this.node.getChildByName("top").getChildByName("Timer").getComponent(Label);
-        this.videoPlayer = this.node.getChildByName("VideoPanel").getChildByName("VideoPlayer").getComponent(VideoPlayer);
+        this.videoPlayer = this.node.getChildByName("VideoPlayer").getComponent(VideoPlayer);
+        this.videoPlayer.node.active = false;
         ADManager.videoPlayer = this.videoPlayer;
     }
 
@@ -290,7 +291,7 @@ export class game extends Component {
 
         this.pddj()
         this.btn3()
-        this.videoPlayer.node.parent.active = false;
+        // this.videoPlayer.node.active = false;
     }
 
     createBlocksEdit() {
@@ -976,6 +977,7 @@ export class game extends Component {
         }
     }
 
+
     onPropBtnOut() {
         let self = this;
         if (this.canMoveOut()) {
@@ -1019,6 +1021,7 @@ export class game extends Component {
             })
         }
     }
+
 
     onPropBtnRefresh() {
         let self = this;

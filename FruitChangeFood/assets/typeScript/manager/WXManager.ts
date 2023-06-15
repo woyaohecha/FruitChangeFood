@@ -6,6 +6,13 @@ const { ccclass, property } = _decorator;
 
 export class WXManager {
 
+    public static videoClipUrls: string[] = [
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/dance.m4v",
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/father.m4v",
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/work.m4v",
+        "https://cloudcreategame.oss-cn-beijing.aliyuncs.com/pro/games/test/sheep-sheep-res/world-cup.m4v"
+    ]
+
     public static wxLogin(btnInfo: any, onRankGetSettingSuccess: Function) {
         console.log("进入微信登录");
         if (Tools.platform != "wx") {

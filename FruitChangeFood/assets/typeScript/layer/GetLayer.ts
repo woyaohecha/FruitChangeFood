@@ -42,5 +42,24 @@ export class GetLayer extends Component {
             Tools.showCommonTips("复制成功", this.node.parent);
         }
     }
+
+    onMiniBtn() {
+        if (Tools.platform == "wx") {
+            console.log("navigateToMiniProgram");
+            wx.navigateToMiniProgram({
+                appId: 'wxaaf796d43c4e9669',
+                path: '',
+                extraData: {
+                    foo: 'bar'
+                },
+                envVersion: '',
+                success(res) {
+                    // 打开成功
+                }
+            })
+        }
+    }
+
+
 }
 
