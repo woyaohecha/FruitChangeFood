@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math, director, VideoPlayer } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math, director, VideoPlayer, Canvas } from 'cc';
 import { block } from './block';
 import { gameData } from './gameData';
 import { ADManager } from './manager/ADManager';
@@ -43,6 +43,16 @@ export class game extends Component {
     @property({ type: [AudioClip] })
     arrAudio = []
 
+    @property(Node)
+    btnClose: Node = null;
+
+    @property(Node)
+    mainCanvas: Node = null;
+
+    @property(Node)
+    adCanvas: Node = null;
+
+
 
     numTouchStart: number;
     numTouchEnd: number;
@@ -76,14 +86,15 @@ export class game extends Component {
 
     timer: number;
     timerLabel: Label;
-    videoPlayer: VideoPlayer;
+    // videoPlayer: VideoPlayer;
 
     onLoad() {
         this.layerSetting = this.node.getChildByName("LayerSetting");
         this.timerLabel = this.node.getChildByName("top").getChildByName("Timer").getComponent(Label);
-        this.videoPlayer = this.node.getChildByName("VideoPlayer").getComponent(VideoPlayer);
-        this.videoPlayer.node.active = false;
-        ADManager.videoPlayer = this.videoPlayer;
+        ADManager.adCanvas = this.adCanvas;
+        ADManager.mainCanvas = this.mainCanvas;
+        this.adCanvas.active = false;
+        this.mainCanvas.active = true;
     }
 
     start() {
@@ -623,6 +634,10 @@ export class game extends Component {
             self.btn1()
             self.schedule(self.timerRun, 1);
         });
+    }
+
+    onBtnVideoStop() {
+        ADManager.stopVideo();
     }
 
     onBtnBackToHome() {

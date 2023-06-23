@@ -86,7 +86,7 @@
         "_value": true
       },
       "video": {
-        "_value": true
+        "_value": false
       },
       "webview": {
         "_value": false
@@ -123,8 +123,7 @@
       "intersection-2d",
       "profiler",
       "tween",
-      "ui",
-      "video"
+      "ui"
     ],
     "noDeprecatedFeatures": {
       "value": false,
@@ -133,6 +132,6 @@
     "flags": {}
   },
   "macroConfig": {
-    "ENABLE_TRANSPARENT_CANVAS": false
+    "ENABLE_TRANSPARENT_CANVAS": true
   }
 }

@@ -31,6 +31,9 @@ export class JsonManager {
                     console.log("bookIcons加载失败:", e);
                     return;
                 }
+                assets.sort((a, b) => {
+                    return Number(a.name) - Number(b.name);
+                })
                 for (let i = 0; i < this.bookList.length; i++) {
                     this.bookList[i].icon = assets[i];
                 }
