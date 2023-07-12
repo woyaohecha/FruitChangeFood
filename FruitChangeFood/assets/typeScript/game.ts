@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math, director, VideoPlayer, Canvas } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, input, Input, EventTouch, UITransform, Vec3, Vec2, Color, Sprite, tween, Label, AudioSource, AudioClip, sys, view, math, director, VideoPlayer, Canvas, Scene } from 'cc';
 import { block } from './block';
 import { gameData } from './gameData';
 import { ADManager } from './manager/ADManager';
@@ -46,11 +46,9 @@ export class game extends Component {
     @property(Node)
     btnClose: Node = null;
 
-    @property(Node)
-    mainCanvas: Node = null;
+    @property(VideoPlayer)
+    videoPlayer: VideoPlayer = null;
 
-    @property(Node)
-    adCanvas: Node = null;
 
 
 
@@ -86,15 +84,17 @@ export class game extends Component {
 
     timer: number;
     timerLabel: Label;
-    // videoPlayer: VideoPlayer;
 
     onLoad() {
         this.layerSetting = this.node.getChildByName("LayerSetting");
         this.timerLabel = this.node.getChildByName("top").getChildByName("Timer").getComponent(Label);
-        ADManager.adCanvas = this.adCanvas;
-        ADManager.mainCanvas = this.mainCanvas;
-        this.adCanvas.active = false;
-        this.mainCanvas.active = true;
+        // ADManager.adCanvas = this.adCanvas;
+        // ADManager.mainCanvas = this.mainCanvas;
+        // this.adCanvas.active = false;
+        // this.mainCanvas.active = true;
+        ADManager.videoPlayer = this.videoPlayer;
+        ADManager.videoPlayer.node.active = false;
+        ADManager.videoPlayer.node.parent.active = false;
     }
 
     start() {
@@ -628,7 +628,7 @@ export class game extends Component {
     onBtnRelive() {
         console.log("复活流程");
         let self = this;
-        ADManager.showVideoAd(() => {
+        ADManager.showVideoAd1(() => {
             self.gameType = 0
             self.layerOver.active = false
             self.btn1()
@@ -637,7 +637,7 @@ export class game extends Component {
     }
 
     onBtnVideoStop() {
-        ADManager.stopVideo();
+        ADManager.stopVideo1();
     }
 
     onBtnBackToHome() {
@@ -996,7 +996,7 @@ export class game extends Component {
     onPropBtnOut() {
         let self = this;
         if (this.canMoveOut()) {
-            ADManager.showVideoAd(() => {
+            ADManager.showVideoAd1(() => {
                 self.btn1();
             })
         }
@@ -1031,7 +1031,7 @@ export class game extends Component {
     onPropBtnBack() {
         let self = this;
         if (this.canBack()) {
-            ADManager.showVideoAd(() => {
+            ADManager.showVideoAd1(() => {
                 self.btn2();
             })
         }
@@ -1040,7 +1040,7 @@ export class game extends Component {
 
     onPropBtnRefresh() {
         let self = this;
-        ADManager.showVideoAd(() => {
+        ADManager.showVideoAd1(() => {
             self.btn3();
         })
     }

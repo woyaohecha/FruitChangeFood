@@ -1,3 +1,11 @@
+/*
+ * @Author: LXR 923390756@qq.com
+ * @Date: 2023-05-19 23:45:28
+ * @LastEditors: LXR 923390756@qq.com
+ * @LastEditTime: 2023-07-13 05:31:51
+ * @FilePath: \FruitChangeFood\assets\typeScript\block.ts
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { _decorator, Component, Node, UITransform, Rect, SpriteFrame, Sprite, tween, Vec3 } from 'cc';
 const { ccclass, property } = _decorator;
 
@@ -51,7 +59,7 @@ export class block extends Component {
             .call(() => {
                 this.spYuanSu.spriteFrame = this.spfYuanSu[this.blockType]
             })
-            .to(0.1, { scale: new Vec3(0.8, 0.8, 0.8) })
+            .to(0.1, { scale: new Vec3(0.85, 0.85, 0.85) })
             .start()
 
 
